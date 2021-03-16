@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public Inventory inventory;
     public float speed = 8.0f;
 
     private Rigidbody m_Rb;
@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     {
         m_Rb = GetComponent<Rigidbody>();
         m_Camera = Camera.main;
+
+        inventory.AwakeInventory();
     }
 
     void FixedUpdate()
@@ -65,5 +67,24 @@ public class PlayerController : MonoBehaviour
         }
 
         m_TargetRotation = targetRotation;
+    }
+
+    public void OnItemPickup(string itemName)
+    {
+        inventory.AddItem(itemName);
+    }
+
+    public void OnItemUse()
+    {
+        if (inventory.items.Count == 0)
+        {
+            return;
+        }
+
+        var itemIndex = 0;
+        var itemName = inventory.items[itemIndex];
+        inventory.RemoveItem(0);
+        GameObject item = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/" + itemName + ".prefab", typeof(GameObject)) as GameObject;
+        Instantiate(item, transform.position + transform.forward * 5.0f, transform.rotation);
     }
 }
